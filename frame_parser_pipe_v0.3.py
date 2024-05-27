@@ -2,7 +2,8 @@ import sys
 
 TYPE_IDENTIFICATION_MAP = {
     0x01: "Measured Values",
-    0x0D: "Status Information"
+    0x0D: "Status Information",
+    0xA0: "Relay Actions (Type 160)"
     # Add more types as needed
 }
 
@@ -40,6 +41,24 @@ STATUS_INFORMATION_MAP = {
     208: "Disk emulation status"
     # Add more status information as needed
 }
+RELAY_ACTIONS_MAP = {
+    151: "Relay PICKUP",
+    161: "Relay GENERAL TRIP command",
+    177: "Primary fault current Ia",
+    178: "Primary fault current Ib",
+    179: "Primary fault current Ic",
+    1800: "50-2 picked up",
+    1805: "50-2 TRIP",
+    1810: "50-1 picked up",
+    1815: "50-1 TRIP",
+    1820: "51 picked up",
+    1825: "51 TRIP",
+    1831: "50N-2 picked up",
+    1833: "50N-2 TRIP",
+    1834: "50N-1 picked up",
+    1866: "51 Disk emulation Pickup"
+    # Add more relay actions as needed
+}
 
 def type_identification_description(type_id):
     return TYPE_IDENTIFICATION_MAP.get(type_id, f"Unknown Type ({type_id})")
@@ -49,6 +68,10 @@ def measured_value_description(info_number):
 
 def status_information_description(info_number):
     return STATUS_INFORMATION_MAP.get(info_number, f"Unknown Status ({info_number})")
+
+def relay_actions_description(info_number):
+    return RELAY_ACTIONS_MAP.get(info_number, f"Unknown Relay Action ({info_number})")
+
 
 def parse_iec103_frame(frame):
     frame_dict = {}
@@ -94,6 +117,10 @@ def parse_iec103_frame(frame):
         asdu['Information number'] = measured_value_description(info_number)
     elif type_id == 0x0D:
         asdu['Information number'] = status_information_description(info_number)
+    elif type_id == 0xA0:
+        asdu['Information number'] = relay_actions_description(info_number)
+    elif type_id == 0x96:
+        asdu['Information number'] = relay_actions_description(info_number)
     else:
         asdu['Information number'] = f"Unknown Information number ({info_number})"
     index += 1
